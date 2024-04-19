@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  <title>Standup NLP</title>
+</head>
+
+<body>
+    {% include 'nav.html' %}
+</body>
+
+<div class="column">
+    <div class="container bg-primary" style='border-radius:10px'>
+        <center>
+        <h1>Word Cloud Generator</h1>        
+        <div class="row">
+            <div class="col-sm-4">
+                <h3>Threshold
+                    <span class="glyphicon glyphicon-info-sign" data-toggle="tooltip" 
+                    data-placement="bottom" title="Filters out the top n words used by all comedians. (Must be in the interval 0 to 250)"></span>
+                </h3>
+                <input type='number' id="threshold" step='1' min='0' max='250'
+                        value="{{default_threshold}}" style='color:black; border-radius:4px;'></input>
+            </div>
+            <div class="col-sm-4">
+                <h3>Comedian</h3>
+                <select id='name' style='color:black; border-radius:4px;'>
+                    {%for n in names%}
+                    <option value='{{n}}'>{{n.title()}}</option>
+                    {%endfor%}
+                </select>
+            </div>
+            <div class="col-sm-4">
+            <br>
+            <br>
+              <button type="button" class="btn btn-lg" id='submit' style="background-color: #cc6600; color: white;border:2px solid black;">Generate</button>
+            </div>
+        </div>
+        <br>
+        </center>
+    </div>
+    <span id="word_cloud"></span>
+</div>
+      {%include 'footer.html'%}
+
+<script>
+    'use strict';
+
+    function handleResponse(response) {
+    $('#word_cloud').html(response);
+    }
+
+    let requestRecs = null;
+
+    function getResults() {
+        console.log('getting results')
+        let url = '/makeWordCloud';
+
+        let data = {};
+        data['name'] = $('#name').val()
+        data['threshold'] = $('#threshold').val()
+
+        if (requestRecs != null)
+            requestRecs.abort();
+
+        console.log(data)
+        requestRecs = $.ajax(
+            {
+            type: 'POST',
+            url: url,
+            data: data,
+            success: handleResponse
+            }
+        );
+    }
+
+    function setup() {
+    $('#submit').on('click', getResults);
+    }
+
+    $('document').ready(setup);
+
+    $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
+</script>
+
+</html>
