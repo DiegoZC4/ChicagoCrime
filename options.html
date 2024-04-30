@@ -1,0 +1,137 @@
+<form id="options" method="post">
+    <h3>Filter Data</h3>
+    <div class="row">
+        <div class="col-md-3">
+            <label for="startDate">Start Date</label>
+            <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title='Data spans {{dateBounds[0]}} <br> to {{dateBounds[1]}}' data-bs-html="true"></i>
+            <input type="text" class="form-control" id="startDate" name="startDate" placeholder="Select Start Date...">
+        </div>
+        <div class="col-md-3">
+            <label for="endDate">End Date</label>
+            <input type="text" class="form-control" id="endDate" name="endDate" placeholder="Select End Date...">
+        </div>
+        <div class="col-md-3">
+            <label for="startTime">Start Time</label>
+            <i class="bi bi-info-circle" data-bs-toggle="tooltip" data-bs-placement="right" data-bs-title='Time window for each <br> day in range' data-bs-html="true"></i>
+            <input type="text" class="form-control" id="startTime" name="startTime" placeholder="Select Start Time...">
+        </div>
+        <div class="col-md-3">
+            <label for="endTime">End Time</label>
+            <input type="text" class="form-control" id="endTime" name="endTime" placeholder="Select End Time...">
+        </div>
+    </div>
+    <br>
+    <div class="row">
+        <div class="col-md-3">
+        <label for="weekday">Days of the Week</label>
+        <ul class="allow-focus form-check" id="weekday">
+        <li><label><input class="form-check-input" type="checkbox" name="Sunday" checked> Sunday</label></li>
+        <li><label><input class="form-check-input" type="checkbox" name="Monday" checked> Monday</label></li>
+        <li><label><input class="form-check-input" type="checkbox" name="Tuesday" checked> Tuesday</label></li>
+        <li><label><input class="form-check-input" type="checkbox" name="Wednesday" checked> Wednesday</label></li>
+        <li><label><input class="form-check-input" type="checkbox" name="Thursday" checked> Thursday</label></li>
+        <li><label><input class="form-check-input" type="checkbox" name="Friday" checked> Friday</label></li>
+        <li><label><input class="form-check-input" type="checkbox" name="Saturday" checked> Saturday</label></li>
+        </ul>
+        </div>
+        <div class="col-md-6">
+            <label for="details">Filter Details</label>
+            <input type="text" class="form-control " id="details" name="details" placeholder='e.g. "luther,apart,batt" will find Battery in Apartments on MLK Drive.'>
+        </div>
+        <div class="col-md-3">
+            <br>
+            <a type="button" class="btn btn-primary d-block w-100" href="/">Reset Filters</a>
+        </div>
+    </div>
+    <br>
+    <h3>Choose Visualizations</h3>
+    <div class="row">
+        <div class="col-md-3">
+            <label class="form-check-label" for="map">Map</label>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="map" name="Map" checked>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label class="form-check-label" for="table">Table</label>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="table" name="Table" checked>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <label for="plots">Plots</label>
+            <ul class="allow-focus form-check"id="plots">
+                <li><label><input class="form-check-input" type="checkbox" name="Year" checked>Year</label></li>
+                <li><label><input class="form-check-input" type="checkbox" name="Week" checked>Week</label></li>
+                <li><label><input class="form-check-input" type="checkbox" name="Day" checked>Day</label></li>
+            </ul>
+        </div>
+        <div class="col-md-3">
+            <label for="pies">Pie Charts</label>
+            <ul class="allow-focus form-check" id="pies">
+                <li><label><input class="form-check-input" name="Street" type="checkbox">Street</label></li>
+                <li><label><input class="form-check-input" name="Type" type="checkbox" checked>Type</label></li>
+                <li><label><input class="form-check-input" name="Description" type="checkbox">Description</label></li>
+                <li><label><input class="form-check-input" name="Scene" type="checkbox" checked>Scene</label></li>
+                <li><label><input class="form-check-input" name="Neighborhood" type="checkbox" checked>Neighborhood</label></li>
+            </ul>
+        </div>
+        <div class="col-md-6"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 offset-md-4 d-grid gap-2">
+            <button type="submit" class="btn btn-block btn-primary" style="margin-top:10px; position: relative;">
+                Generate Visualizations
+                <span class="spinner-border spinner-border-sm" style="display: none;" id="loadingSpinner" aria-hidden="true"></span>
+                <span class="visually-hidden" id="loadingText" style="display: none;">Loading...</span>
+            </button>
+        </div>
+    </div>
+</form>
+<script>
+    bounds = [Date.parse("{{dateBounds[0]}}"),Date.parse("{{dateBounds[1]}}")]
+    $(function () {
+        $('[data-bs-toggle="tooltip"]').tooltip()
+    })
+    
+    var startDatePicker = $("#startDate").flatpickr({
+        minDate: bounds[0],
+        maxDate: bounds[1],
+        onChange: function(selectedDates) {
+            if (selectedDates[0]) {
+                endDatePicker.set('minDate', selectedDates[0]);
+            }
+        }
+    });
+
+    var endDatePicker = $("#endDate").flatpickr({
+        minDate: bounds[0],
+        maxDate: bounds[1],
+        onChange: function(selectedDates) {
+            if (selectedDates[0]) {
+                startDatePicker.set('maxDate', selectedDates[0]);
+            }
+        }
+    });
+
+    // Initialize time pickers
+    var startTimePicker = $("#startTime").flatpickr({
+        enableTime: true,
+        noCalendar: true,
+        onChange: function(selectedDates) {
+            if (selectedDates[0]) {
+                endTimePicker.set('minTime', selectedDates[0]);
+            }
+        }
+    });
+
+    var endTimePicker = $("#endTime").flatpickr({
+        enableTime: true,
+        noCalendar: true,
+        onChange: function(selectedDates) {
+            if (selectedDates[0]) {
+                startTimePicker.set('maxTime', selectedDates[0]);
+            }
+        }
+    });
+</script>

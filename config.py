@@ -7,7 +7,6 @@ class Config(object):
     CSRF_ENABLED = True
     SECRET_KEY = b'U\x15\xa0\xf7(\xed\x0e\xdd\x90~\xfb\x11\xc7\xd7\x05M\xed(\xea\xd0\xb9bnM'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
-    SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
 class ProductionConfig(Config):
     DEBUG = False

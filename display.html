@@ -1,0 +1,51 @@
+{%if vis['empty'] %}
+<h3>No Data Matches the Filters</h3>
+{%else%}
+<h4><strong class="text-center ">
+    {{vis['count']}} crimes found.
+</strong></h4>
+{%if vis.get('map') %}
+<div class="card">
+    <div class="card-header">
+        Map Legend
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h5>Crime Categories</h5>
+                <ul class="list-group">
+                    {% for category, color in vis['colorLegend'].items() %}
+                    <li class="list-group-item"><span class="legend-color mb-n3" style="background-color: {{color}}; width: 40px; height: 20px; display: inline-block; margin-right: 10px;"></span> {{category}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h5>University of Chicago Police Department Patrol Areas</h5>
+                <ul class="list-group">
+                    {% for category, color in vis['patrolLegend'].items() %}
+                    <li class="list-group-item"><span class="legend-color mb-n3" style="background-color: {{color}}; width: 40px; height: 20px; display: inline-block; margin-right: 10px;"></span> {{category}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="map-container">{{vis['map'] | safe }}</div>
+{%endif%}
+{%for plot in vis['plots']%}
+<div id="plot{{loop.index}}"></div>
+<script>
+    Plotly.react("plot{{loop.index}}", JSON.parse({{ plot|tojson|safe }}));;
+</script>
+{% endfor %}
+<br>
+{{vis['table'] | safe}}
+{%endif%}
+{%if vis['shepherd']%}
+<br>
+<br>
+<div class="typewriter-font text-center">I'm tryin' real hard to be a shepherd.
+    - Jules
+</div>
+{%endif%}
+<br>

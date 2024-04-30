@@ -1,33 +1,100 @@
 <!DOCTYPE html>
 <html>
-{%include 'nav.html'%}
 <head>
-    <title>Standup NLP</title>
-    <meta name="viewport"
-           content="width=device-width, initial-scale=1">
-      
-     <link rel="stylesheet" href=
-"https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
-  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <title>UChicago Crime</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Made with https://gauger.io/fonticon/ -->
+    <link
+    href="{{ url_for('static', filename='favicon_light.ico') }}"
+    rel="icon"
+    media="(prefers-color-scheme: light)"
+    />
+    <link
+    href="{{ url_for('static', filename='favicon_dark.ico') }}"
+    rel="icon"
+    media="(prefers-color-scheme: dark)"
+    />
+    <style>
+        .custom-container {
+            width: 100%; /* Default to full width on smaller screens */
+        }
+
+        @media (min-width: 768px) { /* Adjust width starting from the Bootstrap 'md' breakpoint */
+            .custom-container {
+                width: 90%; /* 90% width on larger screens */
+                margin: 0 auto; /* Centering it */
+            }
+        }
+    </style>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
+    <!-- Bootstrap Bundle JS (includes Popper.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- DataTables CSS and JS -->
+    <link href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap5.min.js"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime&display=swap" rel="stylesheet">
 
 </head>
 <body>
-    <center class="col-sm">
-        <h1>Welcome to my Standup NLP Project Site!</h1>
+    <div class="container custom-container mt-3">
+        <h1 class="text-center">Chicago Crime Visualization</h1>
+        {% include 'options.html' %}
         <br>
-        <br>
-        <p style='font-size:20px; text-indent:40px; text-align:center;'>
-        My Independent work project during the Fall 2020 semester was analyzing
-        language differences across age, race, and gender categories within standup comedy.</p>
-        <br>
-        <p style='font-size:20px; text-indent:40px; text-align:center;'>
-        Big thanks to my faculty advisor, Dr. Christiane Fellbaum!
-        <br><br>
-        View my presentation (linked below) for a more detailed walkthrough of the why and how of my project.
-        </p>
-        <br>
-        <iframe width="420" height="345" src="https://www.youtube.com/embed/LBowtcOoXWY"></iframe>
-    </center>
+        <div id="vis"></div>
+    </div>
 </body>
-{%include 'footer.html'%}
+<style>
+    .typewriter-font {
+        font-family: 'Courier Prime', monospace;
+        font-size: 24px; /* or any size you prefer */
+        white-space: pre-wrap; /* preserves whitespace formatting */
+    }
+</style>
+<script>
+    $(document).ready(function() {
+        $('#options').submit(function(event) {
+            event.preventDefault();  // Prevent default form submission
+            // Show the spinner and loading text
+            $('#loadingSpinner').show();
+            $('#loadingText').show();
+            $.ajax({
+                url: "{{ url_for('options') }}",  // Ensure this is the correct endpoint
+                type: 'POST',
+                data: $(this).serialize(),  // Serialize form data
+                success: function(response) {
+                    $('#vis').html(response);  // Update part of the page
+                    $("#crime_data").addClass("table table-striped");
+                    $('#crime_data').DataTable({
+                        "paging": true,
+                        "ordering": true,
+                        "info": false
+                    });
+                    // Hide the spinner and loading text
+                    $('#loadingSpinner').hide();
+                    $('#loadingText').hide();
+                },
+                error: function(xhr, status, error) {
+                    console.error("Error in submission: ", status, error);
+                    // Hide the spinner and loading text
+                    $('#loadingSpinner').hide();
+                    $('#loadingText').hide();
+                }
+            });
+        });
+    });
+</script>
 </html>
